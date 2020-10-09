@@ -1,0 +1,190 @@
+= Terraform basics on AWS
+Diego Goytia <Diego.Goytia@ibm.com>
+October 8, 2020o
+
+
+*Important note: This whole documentation is based on the training Deploying to AWS with Terraform and Ansible on ACloudGuru.*
+
+
+== Terraform basics
+
+This is a paragraph with a *bold* word and an _italicized_ word.
+
+
+Terraform is a scripting tool for writing infrastructure as code. It has three main competitors - when we're talking about AWS, there are other infrastructure templating options available for other clouds -.
+
+
+I'd like to start by comparing the three most important providers of Infrastructure as Code out there:
+
+.Unordered list Tools comparison
+* Terraform
+** Cloud agnostic solution for deploying infrastructure as Code
+** Usable across all cloud providers
+** Managed through HCL -> Hashicorp Configuration Language
+** It is agentless install
+** Keeps track of the state through labels.
+
+* CloudFormation
+** Keeps track of all the changes
+** Drift detection _investigate further..._
+
+* Ansible
+** You can deploy infra as well.
+** It is also agentless and cloud agnostic.
+** Provides tools for OS Level Action.
+** It is a configuration tools.
+
+
+*The important thing to note here:* Is to note that non of them is better than the other, they all three have their level of difficulty and limitations. In my opinion they are meant to be used *together* rather than one over the other.
+
+
+== Goal of the lab:
+
+Deploy the following resources on AWS through Terraform and configure them through Ansible.
+
+*Multi-Region, Jenkins CI/CD pipeline on two different VPC's*
+
+Component checklist: 
+
+. 2 Regions
+. VPC-Subnets in two different regions
+. VPC Security groups
+. VPC Pairing in both regions
+. Routing tables
+. Internet gateways
+. Jenkins Master and Worker nodes in different regions
+. ALB in front of Jenkins
+. Route 53 DNS to ALB
+. ACM Certificate - SSL.
+
+
+*Patience is the only pre-requisite*
+
+.Important commands:
+****
+ * aws configure
+ * terraform _apply_, _init_, _fmt_, _plan_
+ * aws s3api _list-buckets_, _delete-bucket_, _create-bucket_
+****
+
+
+
+== Terraform required access
+
+Terraform requires you to set some permissions prior to being able to use it on AWS. There are two paths you can follow
+
+. Create an IAM User qwith the required permissions:
+
+  Access through a new API KEY and new AWS config to Deploy the resources.
+
+. Create an EC2 IAM Role:
+
+  Attach the required permissions as a role to an existing user.
+
+
+== Terraform basics
+
+* Terraform init
+** It is used to initialize the terraform configuration files (stored in .terraform)
+** Downloads the required plugins for specific cloud provideres (based on providers.tf)
+** It starts the backend for storing the *state files* (either remote, or local location)
+
+
+* Terraform fmt
+** Formats templates for readability
+** Safe to run as many times as required.
+
+
+* Terraform validate
+** Validates that the config files are ok
+** Safe to run as many times as needed.
+
+* Terraform plan
+** Creates an execution plan that you can then apply
+** Fail safe before actual deployment.
+
+* Terraform apply
+** Creates what's on the execution plan! *BE CAREFUL!*
+** Display terraform plan previous to execution
+** Prompts for user validation before actual execution
+
+* Terraform destroy
+** Destroys all of the resources created through terraform. *BE CAREFUL!*
+
+
+
+== Persisting Terraform State
+
+To persist state you can create a _terraform block_ in a file, for example, _backend_ or _state file location_, or whatever you see more as a natural fit. 
+
+
+For AWS:
+
+[source, HCL]
+----
+terraform {
+  required_version = ">=0.12.0" <1>
+
+  backend "s3" {  <2>
+    region  = "us-west-2" <3>
+    profile = "default" <4>
+    key     = "terraformstatefile" <5>
+    bucket  = "terraformstatebucket-devops-training" <6>
+  }
+}
+
+----
+<1> You can limit the version for a range or specific version of terraform to ensure compatibility (good practice, but optional)
+<2> Declaration block fo the s3 bucket
+<3> Region for our s3 bucket, in this case, I chose _us-west-2_ which corresponds to Oregon in AWS.
+<4> Default profile (AWS) used.
+<5> The name of the file that's going to keep track of our state.
+<6> Name of the bucket that's going to be used.
+
+
+== Setting up providers in Terraform
+
+*Providers* are the main builders of terraform resources. They also have all of the required logic to creating resources specific to the used cloud provider. At the moment, Terraform is available with all major cloud providers (AWS, GCP, Azure, IBM Cloud).
+
+Example of a multi-provider arrangement (for multi-zone deployments), play careful attention to how everything stitches together.
+[source, HCL]
+----
+# providers.tf 
+provider "aws" {
+  profile = var.profile <1>
+  region  = var.region-master <2>
+  alias   = "region-master"
+}
+
+provider "aws" {
+  profile = var.profile<1>
+  region  = var.region-worker <3>
+  alias   = "region-worker"
+}
+
+
+
+# variables.tf
+variable "profile" {
+  type    = string
+  default = "default" <1>
+}
+
+variable "region-master" { <2>
+  type    = string
+  default = "us-east-1" <4>
+}
+
+variable "region-worker" { <3>
+  type    = string
+  default = "us-west-2" <5>
+}
+----
+
+<1> Declaration of the AWS Profile being used.
+<2> Declaration block for the region "region-master"
+<3> Declaration block for the region "region-worker"
+<4> Declaration of the zone used for deployment by "region-master"
+<5> Declaration of the zone used for deployment by "region-worker"
+
+

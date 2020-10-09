@@ -1,0 +1,4 @@
+
+# Untrack the following folders
+.credentials/
+multi_zone_vpc_aws/.terraform/*

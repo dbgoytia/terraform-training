@@ -1,0 +1,10 @@
+First results: 
+
+One of the routes showed: 
+On the us-east-1 region ROUTE TABLE:
+192.168.1.0/24 pcx-026dff27fdf2210bf  blackhole No
+
+I think the blackhole was due to the VPC peering request waiting for accept, I missed to add the auto accept on the networks.tf (it's there now).
+
+
+
