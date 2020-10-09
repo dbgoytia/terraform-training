@@ -1,6 +1,6 @@
 = Terraform basics on AWS
 Diego Goytia <Diego.Goytia@ibm.com>
-October 8, 2020o
+1.0 ,October 8, 2020
 
 
 *Important note: This whole documentation is based on the training Deploying to AWS with Terraform and Ansible on ACloudGuru.*
