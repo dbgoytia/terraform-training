@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "0.12.29",
-  "serial": 5,
+  "serial": 7,
   "lineage": "7bdb6d71-698b-e2ba-557b-07ae1bbe61f5",
   "outputs": {},
   "resources": [
@@ -21,7 +21,7 @@
             "group_names": [
               "us-east-1"
             ],
-            "id": "2020-10-08 23:47:20.325584205 +0000 UTC",
+            "id": "2020-10-10 01:48:15.342691217 +0000 UTC",
             "names": [
               "us-east-1a",
               "us-east-1b",
@@ -39,26 +39,6 @@
               "use1-az3",
               "use1-az5"
             ]
-          }
-        }
-      ]
-    },
-    {
-      "mode": "data",
-      "type": "aws_ssm_parameter",
-      "name": "linuxAmOregon",
-      "provider": "provider.aws.region-worker",
-      "instances": [
-        {
-          "schema_version": 0,
-          "attributes": {
-            "arn": "arn:aws:ssm:us-west-2:779136181681:parameter/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
-            "id": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
-            "name": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
-            "type": "String",
-            "value": "ami-0528a5175983e7f28",
-            "version": 34,
-            "with_decryption": true
           }
         }
       ]
@@ -84,6 +64,26 @@
       ]
     },
     {
+      "mode": "data",
+      "type": "aws_ssm_parameter",
+      "name": "linuxAmiOregon",
+      "provider": "provider.aws.region-worker",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ssm:us-west-2:779136181681:parameter/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+            "id": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+            "name": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+            "type": "String",
+            "value": "ami-0528a5175983e7f28",
+            "version": 34,
+            "with_decryption": true
+          }
+        }
+      ]
+    },
+    {
       "mode": "managed",
       "type": "aws_internet_gateway",
       "name": "igw",
@@ -92,11 +92,11 @@
         {
           "schema_version": 0,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:internet-gateway/igw-03d272decf4893945",
-            "id": "igw-03d272decf4893945",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:internet-gateway/igw-0bc82e78519b905c3",
+            "id": "igw-0bc82e78519b905c3",
             "owner_id": "779136181681",
             "tags": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -114,11 +114,11 @@
         {
           "schema_version": 0,
           "attributes": {
-            "arn": "arn:aws:ec2:us-west-2:779136181681:internet-gateway/igw-04ddc9667b1ffdc15",
-            "id": "igw-04ddc9667b1ffdc15",
+            "arn": "arn:aws:ec2:us-west-2:779136181681:internet-gateway/igw-0882b77f3850ea924",
+            "id": "igw-0882b77f3850ea924",
             "owner_id": "779136181681",
             "tags": null,
-            "vpc_id": "vpc-0a6774913b3d38892"
+            "vpc_id": "vpc-05501d5b1985ddcc6"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -136,10 +136,10 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "rtbassoc-0230a7a2b055d8030",
-            "original_route_table_id": "rtb-0889dd34768c0149a",
-            "route_table_id": "rtb-0c9199facadc6b4f9",
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "id": "rtbassoc-0f287ae5117385e23",
+            "original_route_table_id": "rtb-0868af5ef0a7f3491",
+            "route_table_id": "rtb-06198e7b36639bb5d",
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -161,10 +161,10 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "rtbassoc-0d292250c7fd8589c",
-            "original_route_table_id": "rtb-0e6598883f436f6de",
-            "route_table_id": "rtb-036d225ff2552cbae",
-            "vpc_id": "vpc-0a6774913b3d38892"
+            "id": "rtbassoc-02f52647e1acec622",
+            "original_route_table_id": "rtb-0c9c45dabb4d7bd55",
+            "route_table_id": "rtb-03eafa785bfd121e0",
+            "vpc_id": "vpc-05501d5b1985ddcc6"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -186,14 +186,14 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "rtb-0c9199facadc6b4f9",
+            "id": "rtb-06198e7b36639bb5d",
             "owner_id": "779136181681",
             "propagating_vgws": [],
             "route": [
               {
                 "cidr_block": "0.0.0.0/0",
                 "egress_only_gateway_id": "",
-                "gateway_id": "igw-03d272decf4893945",
+                "gateway_id": "igw-0bc82e78519b905c3",
                 "instance_id": "",
                 "ipv6_cidr_block": "",
                 "local_gateway_id": "",
@@ -212,13 +212,13 @@
                 "nat_gateway_id": "",
                 "network_interface_id": "",
                 "transit_gateway_id": "",
-                "vpc_peering_connection_id": "pcx-0d666d620bce85590"
+                "vpc_peering_connection_id": "pcx-0b13037ac2e550584"
               }
             ],
             "tags": {
               "Name": "Master-Region-RT"
             },
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -239,14 +239,14 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "rtb-036d225ff2552cbae",
+            "id": "rtb-03eafa785bfd121e0",
             "owner_id": "779136181681",
             "propagating_vgws": [],
             "route": [
               {
                 "cidr_block": "0.0.0.0/0",
                 "egress_only_gateway_id": "",
-                "gateway_id": "igw-04ddc9667b1ffdc15",
+                "gateway_id": "igw-0882b77f3850ea924",
                 "instance_id": "",
                 "ipv6_cidr_block": "",
                 "local_gateway_id": "",
@@ -265,13 +265,13 @@
                 "nat_gateway_id": "",
                 "network_interface_id": "",
                 "transit_gateway_id": "",
-                "vpc_peering_connection_id": "pcx-0d666d620bce85590"
+                "vpc_peering_connection_id": "pcx-0b13037ac2e550584"
               }
             ],
             "tags": {
               "Name": "Worker-Region-RT"
             },
-            "vpc_id": "vpc-0a6774913b3d38892"
+            "vpc_id": "vpc-05501d5b1985ddcc6"
           },
           "private": "bnVsbA==",
           "dependencies": [
@@ -292,7 +292,7 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:security-group/sg-0697d23861543e00f",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:security-group/sg-02e2e1076c05d17c7",
             "description": "Allow TCP/8080 \u0026 TCP/22",
             "egress": [
               {
@@ -309,7 +309,7 @@
                 "to_port": 0
               }
             ],
-            "id": "sg-0697d23861543e00f",
+            "id": "sg-02e2e1076c05d17c7",
             "ingress": [
               {
                 "cidr_blocks": [
@@ -345,7 +345,7 @@
                 "prefix_list_ids": [],
                 "protocol": "tcp",
                 "security_groups": [
-                  "sg-04c51f31c5807c796"
+                  "sg-089fa530023d1b4f5"
                 ],
                 "self": false,
                 "to_port": 8080
@@ -357,7 +357,7 @@
             "revoke_rules_on_delete": false,
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
           "dependencies": [
@@ -376,7 +376,7 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-west-2:779136181681:security-group/sg-05be1197aaac76c60",
+            "arn": "arn:aws:ec2:us-west-2:779136181681:security-group/sg-009ae99b28e3fb324",
             "description": "Allow TCP/22",
             "egress": [
               {
@@ -393,7 +393,7 @@
                 "to_port": 0
               }
             ],
-            "id": "sg-05be1197aaac76c60",
+            "id": "sg-009ae99b28e3fb324",
             "ingress": [
               {
                 "cidr_blocks": [
@@ -428,7 +428,7 @@
             "revoke_rules_on_delete": false,
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-0a6774913b3d38892"
+            "vpc_id": "vpc-05501d5b1985ddcc6"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
           "dependencies": [
@@ -446,7 +446,7 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:security-group/sg-04c51f31c5807c796",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:security-group/sg-089fa530023d1b4f5",
             "description": "Allow 443 and traffic to Jenkins SG",
             "egress": [
               {
@@ -463,7 +463,7 @@
                 "to_port": 0
               }
             ],
-            "id": "sg-04c51f31c5807c796",
+            "id": "sg-089fa530023d1b4f5",
             "ingress": [
               {
                 "cidr_blocks": [
@@ -498,7 +498,7 @@
             "revoke_rules_on_delete": false,
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
           "dependencies": [
@@ -516,12 +516,12 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:subnet/subnet-062e51661899e6e8b",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:subnet/subnet-034d9fff474880dba",
             "assign_ipv6_address_on_creation": false,
             "availability_zone": "us-east-1a",
             "availability_zone_id": "use1-az1",
             "cidr_block": "10.0.1.0/24",
-            "id": "subnet-062e51661899e6e8b",
+            "id": "subnet-034d9fff474880dba",
             "ipv6_cidr_block": "",
             "ipv6_cidr_block_association_id": "",
             "map_public_ip_on_launch": false,
@@ -529,7 +529,7 @@
             "owner_id": "779136181681",
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
           "dependencies": [
@@ -547,12 +547,12 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-west-2:779136181681:subnet/subnet-021c4b74ed1f4a7e4",
+            "arn": "arn:aws:ec2:us-west-2:779136181681:subnet/subnet-065e6a829feceadec",
             "assign_ipv6_address_on_creation": false,
-            "availability_zone": "us-west-2c",
-            "availability_zone_id": "usw2-az3",
+            "availability_zone": "us-west-2d",
+            "availability_zone_id": "usw2-az4",
             "cidr_block": "192.168.1.0/24",
-            "id": "subnet-021c4b74ed1f4a7e4",
+            "id": "subnet-065e6a829feceadec",
             "ipv6_cidr_block": "",
             "ipv6_cidr_block_association_id": "",
             "map_public_ip_on_launch": false,
@@ -560,7 +560,7 @@
             "owner_id": "779136181681",
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-0a6774913b3d38892"
+            "vpc_id": "vpc-05501d5b1985ddcc6"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
           "dependencies": [
@@ -578,12 +578,12 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:subnet/subnet-0e09bbf592ed61709",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:subnet/subnet-0de3a1ba2211dcfa6",
             "assign_ipv6_address_on_creation": false,
             "availability_zone": "us-east-1b",
             "availability_zone_id": "use1-az2",
             "cidr_block": "10.0.2.0/24",
-            "id": "subnet-0e09bbf592ed61709",
+            "id": "subnet-0de3a1ba2211dcfa6",
             "ipv6_cidr_block": "",
             "ipv6_cidr_block_association_id": "",
             "map_public_ip_on_launch": false,
@@ -591,7 +591,7 @@
             "owner_id": "779136181681",
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
           "dependencies": [
@@ -609,22 +609,22 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-east-1:779136181681:vpc/vpc-00dbb1194fa6a2aac",
+            "arn": "arn:aws:ec2:us-east-1:779136181681:vpc/vpc-054abf43e60388795",
             "assign_generated_ipv6_cidr_block": false,
             "cidr_block": "10.0.0.0/16",
-            "default_network_acl_id": "acl-05338c36cc7e6ec48",
-            "default_route_table_id": "rtb-0889dd34768c0149a",
-            "default_security_group_id": "sg-0d403f7df2fd9c1dc",
+            "default_network_acl_id": "acl-09258248cfbc5e382",
+            "default_route_table_id": "rtb-0868af5ef0a7f3491",
+            "default_security_group_id": "sg-0203c59a54dc5cdf5",
             "dhcp_options_id": "dopt-74ee7d0e",
             "enable_classiclink": false,
             "enable_classiclink_dns_support": false,
             "enable_dns_hostnames": true,
             "enable_dns_support": true,
-            "id": "vpc-00dbb1194fa6a2aac",
+            "id": "vpc-054abf43e60388795",
             "instance_tenancy": "default",
             "ipv6_association_id": "",
             "ipv6_cidr_block": "",
-            "main_route_table_id": "rtb-0889dd34768c0149a",
+            "main_route_table_id": "rtb-0868af5ef0a7f3491",
             "owner_id": "779136181681",
             "tags": {
               "Name": "master-vpc-jenkins"
@@ -643,22 +643,22 @@
         {
           "schema_version": 1,
           "attributes": {
-            "arn": "arn:aws:ec2:us-west-2:779136181681:vpc/vpc-0a6774913b3d38892",
+            "arn": "arn:aws:ec2:us-west-2:779136181681:vpc/vpc-05501d5b1985ddcc6",
             "assign_generated_ipv6_cidr_block": false,
             "cidr_block": "192.168.0.0/16",
-            "default_network_acl_id": "acl-0f9492070ec281980",
-            "default_route_table_id": "rtb-0e6598883f436f6de",
-            "default_security_group_id": "sg-04ac0a37f426c2397",
+            "default_network_acl_id": "acl-0aaea4e3913c9a88f",
+            "default_route_table_id": "rtb-0c9c45dabb4d7bd55",
+            "default_security_group_id": "sg-0cb60ce4e09651b1f",
             "dhcp_options_id": "dopt-ff8ff987",
             "enable_classiclink": false,
             "enable_classiclink_dns_support": false,
             "enable_dns_hostnames": true,
             "enable_dns_support": true,
-            "id": "vpc-0a6774913b3d38892",
+            "id": "vpc-05501d5b1985ddcc6",
             "instance_tenancy": "default",
             "ipv6_association_id": "",
             "ipv6_cidr_block": "",
-            "main_route_table_id": "rtb-0e6598883f436f6de",
+            "main_route_table_id": "rtb-0c9c45dabb4d7bd55",
             "owner_id": "779136181681",
             "tags": {
               "Name": "worker-vpc-jenkins"
@@ -680,10 +680,10 @@
             "accept_status": "pending-acceptance",
             "accepter": [],
             "auto_accept": null,
-            "id": "pcx-0d666d620bce85590",
+            "id": "pcx-0b13037ac2e550584",
             "peer_owner_id": "779136181681",
             "peer_region": "us-west-2",
-            "peer_vpc_id": "vpc-0a6774913b3d38892",
+            "peer_vpc_id": "vpc-05501d5b1985ddcc6",
             "requester": [
               {
                 "allow_classic_link_to_remote_vpc": false,
@@ -693,7 +693,7 @@
             ],
             "tags": null,
             "timeouts": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac"
+            "vpc_id": "vpc-054abf43e60388795"
           },
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMCwiZGVsZXRlIjo2MDAwMDAwMDAwMCwidXBkYXRlIjo2MDAwMDAwMDAwMH19",
           "dependencies": [
@@ -721,10 +721,10 @@
               }
             ],
             "auto_accept": true,
-            "id": "pcx-0d666d620bce85590",
+            "id": "pcx-0b13037ac2e550584",
             "peer_owner_id": "779136181681",
             "peer_region": "us-west-2",
-            "peer_vpc_id": "vpc-0a6774913b3d38892",
+            "peer_vpc_id": "vpc-05501d5b1985ddcc6",
             "requester": [
               {
                 "allow_classic_link_to_remote_vpc": false,
@@ -733,8 +733,8 @@
               }
             ],
             "tags": null,
-            "vpc_id": "vpc-00dbb1194fa6a2aac",
-            "vpc_peering_connection_id": "pcx-0d666d620bce85590"
+            "vpc_id": "vpc-054abf43e60388795",
+            "vpc_peering_connection_id": "pcx-0b13037ac2e550584"
           },
           "private": "bnVsbA==",
           "dependencies": [
