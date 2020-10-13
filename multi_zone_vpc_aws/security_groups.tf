@@ -13,8 +13,8 @@ resource "aws_security_group" "lb-sg" {
   }
   ingress {
     description = "Allow 80 from anywhere for redirection"
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.webserver-port
+    to_port     = var.webserver-port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

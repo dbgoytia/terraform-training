@@ -1,0 +1,312 @@
+
+
+= Deploying APP VMs configured through Ansible
+Diego Canizales <diego.canizales1995@gmail.com>
+1.0, October 11, 2020
+
+
+== Deploying Application VMs using Terraform
+
+By the end of this section, you'll see how to deploy a VM, that is configured through SSM Parameter Store, in order to fetch the AMI (Amazon Machine Image). You'll learn how  to configure the respective SSH keys for you to be able to login to the console, learn a little bit about the boot process of Amazon EC2 instances, and how to automate the provisioning of applications and configuration to your instances using a configuration management tool like Ansible. You'll also learn a boarder view into how to use outputs on terraform to keep various aspects of your deployment file good, like access IP's or DNS hostnames.
+
+
+Goals:
+
+* Provision EC2 instances using SSM Parameter Store for AMI ID's
+* Deploy your SSH key-pairs prior to creation of EC2 instances
+* Configure your Ansible provisioner for deploying applications in your EC2 instances.
+
+
+== What is Amazon SSM Parameter Store
+
+Amazon SSM (Systems Manager) Parameter Store, is a service that lets you store systems configuration information in a safe, easy to access way. There are a lot of capabilities around SSM, and the one we're going to use in this lab *by acloudguru*, is to store AMI images ID's. 
+
+AMI's, or Amazon Machine Images, provide the required information to launch an instance. You must specify an AMI when you launch an instance. Then, being able to provide AMI's through a service like SSM Parameter Store, lets you:
+
+* Not have to remember or hardcode AMI ID's across your environment
+* Makes stuff more repetable.
+
+
+You have to remember that Amazon Images are directly managed by the Amazon serivce.
+
+
+== Provisioning an instance using SSM Parameter endpoint.
+
+
+For this example, we're going to deploy a simple Amazon2 Linux image, using the *data source* in terraform.
+
+
+
+[source, HCL]
+----
+# Get Linux AMI ID using SSM Parameter endpoint in us-east-1 for jenkins master
+data "aws_ssm_parameter" "linuxAmi" {
+  provider = aws.region-master
+  name     = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2" <1>
+}
+----
+<1> As you can see you're only making the call to the endpoint required for obtaining the image for deploying the Amazon2 AMI, for x86_64 architectures. You don't really have to do that much else!
+
+
+
+== Creating key-paris for logging into the EC2 instance created in the previous example:
+
+Remember you need ot have your ssh-key created prior to deploying it on an EC2 Instance. The reason that you're copying your SSH key like this and not as you normally would, is because EC2 instances get their SSH-Keys copied PRIOR to creation (as an advanced security freature).
+
+
+[source, HCL]
+----
+# Create key-pairs for logging into EC2 in us-east-1
+resource "aws_key_pair" "master-key" {
+  provider   = aws.region-master
+  key_name   = "jenkins" <1>
+  public_key = file("~/.ssh/id_rsa.pub") <2>
+}
+----
+
+<1> They name you would like to give to your SSH-key.
+<2> The path to the location of your newly created SSH-key.
+
+
+Remember you can create your SSH keys like this:
+
+    user@host: $ ssh-keygen
+
+
+== Create an EC2 instance:
+
+[source, HCL]
+----
+# Create the EC2 instance for the jenkins master
+resource "aws_instance" "jenkins-master" {
+  provider                    = aws.region-master
+  ami                         = data.aws_ssm_parameter.linuxAmi.value <1>
+  instance_type               = var.instance-type <2>
+  key_name                    = aws_key_pair.master-key.key_name <3>
+  associate_public_ip_address = true 
+  vpc_security_group_ids      = [aws_security_group.jenkins-sg.id] <4>
+  subnet_id                   = aws_subnet.subnet_1.id <5>
+
+  tags = {
+    Name = "jenkins_master_tf"
+  }
+
+  depends_on = [aws_main_route_table_association.set-master-default-rt-assoc] <6>
+
+}
+----
+
+<1> Provision the AMI Image parameter dynamically using the aws ssm parameter we created previously.
+<2> Dynamically assign your instance-type through your *variables.tf* file.
+<3> Associate your SSH-Key you created previously.
+<4> A list of security groups you've created for this particular instance
+<5> The subnet in which the instance will deploy
+<6> *First appearance* of a dependency. As you can see, *creation* of this intance depends on the creation on the main route table association we created on previous steps. Usin this syntax you can create your instance dynamically and ensuring resources exist correctly.
+
+
+TIP:  If deployment of an EC2  Instance fails, you'll see it marked as *tainted*
+
+
+== Dynamically provisioning multiple machines of the same type
+
+With Terraform, you can do a little bit of a more interesting schema, you can deploy "n" number of instances, using your varibles folder. This is a cool trick if you want to spin up or down your instances that are supposed to be the same (any slave nodes, for example).
+
+[source, HCL]
+----
+# Create EC2 in us-west-2
+resource "aws_instance" "jenkins-worker-oregon" {
+  provider                    = aws.region-worker
+  count                       = var.workers-count <1>
+  ami                         = data.aws_ssm_parameter.linuxAmiOregon.value
+  instance_type               = var.instance-type <2>
+  key_name                    = aws_key_pair.worker-key.key_name
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.jenkins-sg-oregon.id]
+  subnet_id                   = aws_subnet.subnet_1_oregon.id
+
+
+  tags = {
+    Name = join("_", ["jenkins_worker_tf", count.index + 1])
+  }
+
+  depends_on = [aws_main_route_table_association.set-worker-default-rt-assoc, aws_instance.jenkins-master]
+}
+----
+
+<1> You can set your count number in your variables.tf file:
+<2> Notice how you set your instance-type in your variables.tf so you can have a good magement of your infra
+
+[source, HCL]
+----
+## variables.tf
+
+# Increase or decrese number of instances through environment variables
+variable "workers-count" {
+  type    = number
+  default = 2 <1>
+}
+
+# For the instance type, used in the last two examples:
+variable "instance-type" {
+  type    = string
+  default = "t3.micro"
+}
+----
+<1> Each time you redeploy your infrastructure, you can now simply use this value for scaling up or down!
+
+
+
+
+== Output the IP addresses of the instnaces
+
+You can use Terraform output syntax to easily see information about your system, for example, IP Addresses of EC2 created instances.
+
+For example, for a single resource, you can do something like this:
+[source, HCL]
+----
+output "Jenkins-Main-Node-Public-IP" {
+  value = aws_instance.jenkins-master.public_ip
+}
+----
+
+So when you do
+
+    user@host: $ terraform output
+
+You'lle see the IP address of your EC2 instance:
+
+    Jenkins-Main-Node-Public-IP: XXX.XXX.XXX.XXX
+
+But what happens when you create a group of instances at the same time, and still want to retrieve this information in the same fashion? Answer: You use Terraform *for loops*.
+
+[source, HCL]
+----
+output "Jenkins-Worker-Public-IPs" {
+  value = {
+    for instance in aws_instance.jenkins-worker-oregon :
+    instance.id => instance.public_ip
+  }
+}
+----
+
+In this example, since we created a group of worker nodes, through Terraform, printing them individually would be impossible. With this sytnax you're going to be able to see all of the required information to log-in to your systems.
+
+
+== Configuring Ansible as a provisioner, dynamically.
+
+
+Now this is where the interesting part comes in:
+
+If we have created two set of instances, one, a single master vm, and _N_ number of worker nodes, how are we supposed to feed that information into an ansible inventory so ansible-playbooks can automate deployment of configuration and packages? Interesting, huh.
+
+
+Take into consideration that for your ansible inventory, you at least have to know your hostnames and ip addresses to work. Following the same example, you can configure a dynamic provisioner using the following pattern:
+
+[source, HCL]
+----
+provisioner "local-exec" {
+    command = <<EOF
+aws --profile ${var.profile} ec2 wait instance-status-ok <1> --region ${var.region-worker} --instance-ids ${self.id} <2>
+ansible-playbook --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' <3> ansible_templates/jenkins-workers-sample.yaml
+EOF
+  }
+----
+
+You can see that:
+
+. It is waiting for the instance to become available (status-ok)
+. It is retrieving the instance ids
+. You're passing in extra variables to your ansible-playbook in the form of "passed_in_hosts=tag_Name + the name of the created ec2 instance" to the _jenkins-worker_ playbook.
+
+But how is this even possible? We're going to have to modify our Ansible inventory to accept dynamically provisioned instances
+
+[source, yaml]
+----
+plugin: aws_ec2
+
+regions: 
+  - us-east-1
+  - us-west-2
+# - us-east-2
+# set strict to False    
+# if True this will make invalid entries 
+# a fatal error
+strict: False
+
+keyed_groups:
+  #  each aws ec2 instance has it own instance tags. create  
+  #  a tag variable from those tags for ansible to use. 
+  #  if an EC2 tag:Name is acloudguru_machine, it'll be converted to the
+  #  Ansible tag variable name as follows: tag_Name_acloudguru_machine
+  # which can then be passed as a variable value for the host via -e flag
+  - key: tags
+    prefix: tag
+  #
+  # the following keyed groups are from the aws url:
+  # https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html#options   
+  # below are some of the variable that can be used.  
+  # an example for instance_type: 
+  # aws_instance_type_t2_micro
+  - key: architecture
+    prefix: arch
+  - key: tags.Applications
+    separator: ''
+  - key: instance_type
+    prefix: aws_instance_type
+  - key: placement.region
+    prefix: aws_region
+  - key: image_id
+    prefix: aws_image
+  - key: hypervisor
+    prefix: aws_hypervisor
+  - key: 'security_groups|json_query("[].group_id")'
+    prefix: 'security_groups'
+
+hostnames:
+# a list in order of precedence for hostname variables.
+# 
+  - ip-address
+  - dns-name
+  - tag:Name
+----
+
+
+Then updating our Ansible configuration file to take that inventory in:
+
+[source, yaml]
+----
+# Add this lines to your inventory file:
+[defaults]
+inventory          = ./ansible_templates/inventory_aws/tf_aws_ec2.yml
+enable_plugins     = aws_ec2
+interpreter_python = auto_silent
+----
+
+
+WARNING: Remember that Ansible works through Python3. Then you would have to install BOTO3, if you haven't done so, for this to work. Simply execute _pip3 install boto3 --user_ and you're good to go.
+
+
+
+Now handling that extra variable in your playbook is going to be crutial for it to execute correctly. In this example, it is dynamically provisioning jq, using the *yum* module, to your newly created instance, _or instances_. That's cool right?
+
+[source, yaml]
+----
+---
+- hosts: "{{ passed_in_hosts }}"
+  become: yes
+  remote_user: ec2-user
+  become_user: root
+  tasks:
+    - name: install jq, JSON parser
+      yum: 
+        name: jq
+        state: present
+----
+
+
+*CHECKOUT THIS AMAZING REPO: https://github.com/linuxacademy/content-deploying-to-aws-ansible-terraform.git*
+*I want it to be very clear I'm not the original author of this lab. I'm just making my notes to fully understand it and hopefully someone else will benefit from this too.*
+
+
+
+

@@ -20,6 +20,7 @@ variable "external_ip" {
 
 variable "workers-count" {
   type    = number
+<<<<<<< HEAD
   default = 2
 }
 
@@ -28,9 +29,18 @@ variable "instance-type" {
   default = "t3.micro"
 }
 
+=======
+  default = 1
+}
+>>>>>>> 01e8465039e5cd698303c73d52e9c3162a28710f
+
+variable "instance-type" {
+  type    = string
+  default = "t3.micro"
+}
 
 
-
-
-
-
+variable "webserver-port" {
+  type    = number
+  default = 8080
+}

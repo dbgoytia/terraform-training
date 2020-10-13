@@ -39,6 +39,17 @@ resource "aws_instance" "jenkins-master" {
   }
 
   depends_on = [aws_main_route_table_association.set-master-default-rt-assoc]
+<<<<<<< HEAD
+=======
+
+  provisioner "local-exec" {
+    command = <<EOF
+aws --profile ${var.profile} ec2 wait instance-status-ok --region ${var.region-master} --instance-ids ${self.id}
+ansible-playbook --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' ansible_templates/jenkins-master-sample.yaml
+EOF
+  }
+
+>>>>>>> 01e8465039e5cd698303c73d52e9c3162a28710f
 }
 
 
@@ -59,5 +70,15 @@ resource "aws_instance" "jenkins-worker-oregon" {
   }
 
   depends_on = [aws_main_route_table_association.set-worker-default-rt-assoc, aws_instance.jenkins-master]
+<<<<<<< HEAD
+=======
+
+  provisioner "local-exec" {
+    command = <<EOF
+aws --profile ${var.profile} ec2 wait instance-status-ok --region ${var.region-worker} --instance-ids ${self.id}
+ansible-playbook --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' ansible_templates/jenkins-workers-sample.yaml
+EOF
+  }
+>>>>>>> 01e8465039e5cd698303c73d52e9c3162a28710f
 }
 

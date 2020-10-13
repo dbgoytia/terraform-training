@@ -1,6 +1,7 @@
 ---
 - hosts: "{{ passed_in_hosts }} "
   become: yes
+<<<<<<< HEAD
   remote_user: ec2-usr
   become_user: root
   tasks:
@@ -8,3 +9,19 @@
       yum:
         name: git
         state: present
+=======
+  remote_user: ec2-user
+  become_user: root
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+        
+    - name: Start and Enable Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+>>>>>>> 01e8465039e5cd698303c73d52e9c3162a28710f
