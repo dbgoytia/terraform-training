@@ -24,5 +24,3 @@ output "Swarm-Workers-Private-IPs" {
     }
 }
 
-
-
