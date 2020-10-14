@@ -1,0 +1,6 @@
+
+# Untrack the following folders
+.credentials/
+multi_zone_vpc_aws/.terraform/*
+lab_2_vm_provisioning_alb/.terraform/*
+lab_3_swarm_cluster/.terraform/*
