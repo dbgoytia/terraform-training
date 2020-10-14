@@ -21,6 +21,7 @@ resource "aws_instance" "swarm-manager" {
     key_name = aws_key_pair.swarm-key.key_name
     associate_public_ip_address = true
     subnet_id =  aws_subnet.public_manager.id
+    vpc_security_group_ids = [aws_security_group.swarm-sg-east.id]
     tags = {
         Name = "swarm-manager-tf"
     }
@@ -35,8 +36,9 @@ resource "aws_instance" "swarm-nodes" {
     key_name = aws_key_pair.swarm-key.key_name
     associate_public_ip_address = true
     subnet_id = aws_subnet.public_workers.id
+    vpc_security_group_ids = [aws_security_group.swarm-sg-east.id]
     tags = {
-        Name = "swarm-workernodes-tf"
+        Name = join("_" , ["swarm-nodes-tf", count.index + 1])
     }
 
     depends_on = [aws_instance.swarm-manager]
