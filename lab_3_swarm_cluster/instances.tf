@@ -14,7 +14,7 @@ resource "aws_key_pair" "swarm-key" {
 }
 
 # Manager instance
-resource "aws_instance" "swarm-manager" {
+resource "aws_instance" "swarm_manager" {
     provider = aws.region-east
     ami = data.aws_ssm_parameter.SwarmAMI.value
     instance_type = var.instance-type
@@ -23,12 +23,21 @@ resource "aws_instance" "swarm-manager" {
     subnet_id =  aws_subnet.public_manager.id
     vpc_security_group_ids = [aws_security_group.swarm-sg-east.id]
     tags = {
-        Name = "swarm-manager-tf"
+        Name = "swarm_manager_tf"
     }
+
+    provisioner "local-exec" {
+        command = <<EOF
+aws --profile ${var.profile} ec2 wait instance-status-ok --region ${var.region-east} --instance-ids ${self.id} \
+&& ansible-playbook --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' ansible_templates/install_swarm.yaml
+EOF
+    }
+
+    depends_on = [aws_main_route_table_association.set-east-region-assoc]
 }
 
 # Worker nodes
-resource "aws_instance" "swarm-nodes" {
+resource "aws_instance" "swarm_nodes" {
     provider = aws.region-east
     count = var.workers-count
     ami = data.aws_ssm_parameter.SwarmAMI.value
@@ -38,10 +47,10 @@ resource "aws_instance" "swarm-nodes" {
     subnet_id = aws_subnet.public_workers.id
     vpc_security_group_ids = [aws_security_group.swarm-sg-east.id]
     tags = {
-        Name = join("_" , ["swarm-nodes-tf", count.index + 1])
+        Name = join("_" , ["swarm_nodes_tf", count.index + 1])
     }
 
-    depends_on = [aws_instance.swarm-manager]
+    depends_on = [aws_main_route_table_association.set-east-region-assoc, aws_instance.swarm_manager]
 }
 
 
