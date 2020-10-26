@@ -6,3 +6,4 @@ lab_2_vm_provisioning_alb/.terraform/*
 lab_3_swarm_cluster/.terraform/*
 lab_4_static_site_aws/.terraform/*
 lab_4_static_site_aws/static-site/.terraform/*
+lab_7_cloudfront/.terraform/*
