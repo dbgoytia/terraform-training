@@ -175,6 +175,7 @@ resource "aws_vpc_peering_connection_accepter" "accept_peering" {
 
 In order to create a new routing table for our VPC, you'll have to create the desired rules for managing the traffic, and overwrite the default routing table of the VPC.
 
+
 *Creating the routing table* 
 
 [source, HCL]
