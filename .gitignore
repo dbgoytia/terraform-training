@@ -11,3 +11,5 @@ lab_8_IAM/.terraform
 lab_9_s3/.terraform
 lab_10_s3_lifecycle/modules/services/s3/stage/services/s3/.terraform
 lab_11_static_site_self/stage/.terraform
+lab_12_IAM_users/terraform.tfstate*
+lab_12_IAM_users/.terraform
