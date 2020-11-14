@@ -1,0 +1,48 @@
+---
+- hosts: "{{ passed_in_hosts }}"
+  become: yes
+  remote_user: ec2-user
+  become_user: root
+
+  tasks:
+
+  - name:  Update all packages
+    become: true
+    yum:
+      name: '*'
+      update_cache: yes
+      state: latest
+    register: yum_update_result
+
+  
+  - name: Reboot server and wait for it to come back up
+    shell: "sleep 5 && reboot"
+    async: 1
+    poll: 0
+    when: yum_update_result is changed
+  
+  - name: Wait for reboot to complete
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300
+    when: yum_update_result is changed
+
+  - name: Ensure NGINX is at the latest version
+    yum: 
+      name: nginx
+      state: latest
+    
+  - name: Make sure NGINX is running
+    become: true
+    systemd:
+      state: started
+      enabled: yes
+      name: nginx.service
+
+
+
+
+
+    
