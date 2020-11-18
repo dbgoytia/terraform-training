@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12, < 0.13"
+  required_version = ">=0.13"
 }
 
 # Get Linux AMI ID using SSM
@@ -33,15 +33,15 @@ resource "aws_instance" "webserver" {
 
   # Important tags to keep track of anything
   tags = {
-    Name = "webserver_tf"
+    Name = "webserver"
     Department = "R&D"
     Owner = "Diego Goytia"
   }
 
   provisioner "local-exec" {
         command = <<EOF
-aws --profile ${var.profile} ec2 wait instance-status-ok --region us-east-1 --instance-ids ${self.id} \
-&& ansible-playbook --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' ../ansible_templates/install_nginx.yaml
+aws --profile ${var.profile} ec2 wait instance-status-ok --region us-east-1 --instance-ids ${self.id} 
+ansible-playbook  --extra-vars 'passed_in_hosts=tag_Name_${self.tags.Name}' ../ansible_templates/install_nginx.yaml
 EOF
-    }
+  }
 }
