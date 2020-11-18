@@ -24,6 +24,55 @@
       state: started
       enabled: yes
 
+  - name: "create www directory"
+    file:
+      path: /var/www/helloworld.com
+      state: directory
+      mode: '0775'
+      owner: "ec2-user"
+      group: "ec2-user"
+  
+  - name: "create sites enabled directory"
+    file:
+      path: /etc/nginx/sites-enabled
+      state: directory
+      mode: '0775'
+      owner: "ec2-user"
+      group: "ec2-user"
+
+  - name: delete default nginx site
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify: restart nginx
+
+  - name: copy nginx site.conf
+    template:
+      src: ../nginx/site.cfg
+      dest: /etc/nginx/sites-enabled/helloworld.com
+      owner: root
+      group: root
+      mode: '0644'
+    notify: restart nginx
+
+  - name: "sync website"
+    synchronize:
+      src: ../website/
+      dest: /var/www/helloworld.com
+      archive: no
+      checksum: yes
+      recursive: yes
+      delete: yes
+    become: no
+  
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+  
+
+
 
 
 
