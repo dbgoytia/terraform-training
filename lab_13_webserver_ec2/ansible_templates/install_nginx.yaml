@@ -12,34 +12,18 @@
       name: '*'
       update_cache: yes
       state: latest
-    register: yum_update_result
 
-  
-  - name: Reboot server and wait for it to come back up
-    shell: "sleep 5 && reboot"
-    async: 1
-    poll: 0
-    when: yum_update_result is changed
-  
-  - name: Wait for reboot to complete
-    wait_for_connection:
-      connect_timeout: 20
-      sleep: 5
-      delay: 5
-      timeout: 300
-    when: yum_update_result is changed
+  - name: Install Nginx
+    command: amazon-linux-extras install nginx1.12=latest -y
+    args:
+      creates: /sbin/nginx
 
-  - name: Ensure NGINX is at the latest version
-    yum: 
-      name: nginx
-      state: latest
-    
-  - name: Make sure NGINX is running
-    become: true
+  - name: Enable NGINX and ensure it's enabled
     systemd:
+      name: nginx
       state: started
       enabled: yes
-      name: nginx.service
+
 
 
 
