@@ -15,3 +15,5 @@ lab_12_IAM_users/terraform.tfstate*
 lab_12_IAM_users/.terraform
 lab_13_webserver_ec2/stage/.terraform
 lab_13_webserver_ec2/stage/terraform.tfstate*
+lab_14_ebs_migration/stage/.terraform
+lab_14_ebs_migration/stage/terraform.tfstate*
